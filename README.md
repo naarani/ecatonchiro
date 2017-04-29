@@ -15,3 +15,7 @@ not working now...
 2) Apache jclouds, Apache license 2.0
 
 3) yamlbean EsotericSoftware/yamlbeans is licensed under the MIT License
+
+## Sponsor
+IPERIONE SRL
+

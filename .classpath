@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry path="bin" kind="output"/>
 	<classpathentry kind="src" path="ssh"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="src" path="jclouds"/>
+	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
+	<classpathentry path="bin" kind="output"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
 	<classpathentry sourcepath="C:/Users/admin/.gradle/caches/modules-2/files-2.1/log4j/log4j/1.2.17/677abe279b68c5e7490d6d50c6951376238d7d3e/log4j-1.2.17-sources.jar" kind="lib" path="C:/Users/admin/.gradle/caches/modules-2/files-2.1/log4j/log4j/1.2.17/5af35056b4d257e4b64b9e8069c0746e8b08629f/log4j-1.2.17.jar"/>
+	<classpathentry sourcepath="C:/Users/admin/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch/0.1.54/91d6069df9be9e076bdb124e82fc2a9af9547616/jsch-0.1.54-sources.jar" kind="lib" path="C:/Users/admin/.gradle/caches/modules-2/files-2.1/com.jcraft/jsch/0.1.54/da3584329a263616e277e15462b387addd1b208d/jsch-0.1.54.jar"/>
 	<classpathentry sourcepath="C:/Users/admin/.gradle/caches/modules-2/files-2.1/org.apache.jclouds/jclouds-core/2.0.1/a22683795171edd34bc55fb5dddbc693b27b1470/jclouds-core-2.0.1-sources.jar" kind="lib" path="C:/Users/admin/.gradle/caches/modules-2/files-2.1/org.apache.jclouds/jclouds-core/2.0.1/bd69524ec8edada62b8c1c66d7b8075c4843dc6c/jclouds-core-2.0.1.jar"/>
 	<classpathentry sourcepath="C:/Users/admin/.gradle/caches/modules-2/files-2.1/org.apache.jclouds.provider/digitalocean2/2.0.1/1a40c3dd8c1b80278129b78caaed1876733d7d6c/digitalocean2-2.0.1-sources.jar" kind="lib" path="C:/Users/admin/.gradle/caches/modules-2/files-2.1/org.apache.jclouds.provider/digitalocean2/2.0.1/82fbbcd786240139727cb13ad39beea221c8a6c5/digitalocean2-2.0.1.jar"/>
 	<classpathentry sourcepath="C:/Users/admin/.gradle/caches/modules-2/files-2.1/org.apache.jclouds.driver/jclouds-sshj/2.0.1/c81a16c9d20d16cb63d5c8c46425454f3de9fac5/jclouds-sshj-2.0.1-sources.jar" kind="lib" path="C:/Users/admin/.gradle/caches/modules-2/files-2.1/org.apache.jclouds.driver/jclouds-sshj/2.0.1/51e6385327a940000ffb82215e50eb170936e1e4/jclouds-sshj-2.0.1.jar"/>

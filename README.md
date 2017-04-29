@@ -1,9 +1,10 @@
 # selene V
-automation engine
+(agentless) automation engine
+
 
 
 ## Overview
-not working now...
+pre alpha, not working now...
 
 
 
@@ -16,6 +17,9 @@ not working now...
 
 3) yamlbean EsotericSoftware/yamlbeans is licensed under the MIT License
 
+
+
 ## Sponsor
 IPERIONE SRL
+
 

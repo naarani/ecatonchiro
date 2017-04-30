@@ -8,7 +8,7 @@ public class ValidateBennoJoyTask {
 
 	@Test
 	public void testNginxBennoJoy() {
-		String file = "https://github.com/bennojoy/nginx/blob/master/tasks/main.yml";
+		String file = "https://raw.githubusercontent.com/bennojoy/nginx/master/tasks/main.yml";
 		YamlLib lib = new YamlLib();
 		try {
 			lib.setFile( file );

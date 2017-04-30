@@ -11,7 +11,7 @@ import java.util.Map;
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
 
-public class YamlLib {
+public class YamlTaskLib {
 	
 	protected YamlReader reader;
 	protected ArrayList<Map<String,String>> lastItem;
@@ -25,7 +25,7 @@ public class YamlLib {
 	// register
 	// when
 	
-	public YamlLib(){
+	public YamlTaskLib(){
 
 	}
 

@@ -43,6 +43,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.esotericsoftware.yamlbeans/yamlbeans
 	compile group: 'com.esotericsoftware.yamlbeans', name: 'yamlbeans', version: '1.11'
+    // https://mvnrepository.com/artifact/org.yaml/snakeyaml
+	// compile group: 'org.yaml', name: 'snakeyaml', version: '1.18'
     
     testCompile "junit:junit:4.12"    
 }

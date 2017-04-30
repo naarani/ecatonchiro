@@ -1,15 +1,15 @@
-package jtest.yaml.format;
+package jtest.yaml.task.format;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
-import org.naarani.selenev.yaml.YamlLib;
+import org.naarani.selenev.yaml.YamlTaskLib;
 
 public class ValidateBennoJoyTask {
 
 	@Test
 	public void testNginxBennoJoy() {
 		String file = "https://raw.githubusercontent.com/bennojoy/nginx/master/tasks/main.yml";
-		YamlLib lib = new YamlLib();
+		YamlTaskLib lib = new YamlTaskLib();
 		try {
 			lib.setFile( file );
 			while( lib.next() ){
@@ -25,7 +25,7 @@ public class ValidateBennoJoyTask {
 	@Test
 	public void testTaskMysqlBennoJoy() {
 		String file = "https://raw.githubusercontent.com/bennojoy/mysql/master/tasks/main.yml";
-		YamlLib lib = new YamlLib();
+		YamlTaskLib lib = new YamlTaskLib();
 		try {
 			lib.setFile( file );
 			while( lib.next() ){
@@ -37,4 +37,5 @@ public class ValidateBennoJoyTask {
 			fail( "generic problem" + e.getMessage() );
 		}
 	}
+	
 }

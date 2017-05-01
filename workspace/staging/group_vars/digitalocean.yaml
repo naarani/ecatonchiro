@@ -1,0 +1,3 @@
+---
+# file: group_vars/digitalocean.yaml
+digitaloceanToken: insertTokenHere

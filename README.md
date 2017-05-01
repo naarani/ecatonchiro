@@ -4,7 +4,7 @@
 
 
 ## Background
-I run remote deployment installation test of kargo and kubeadm 
+I run remote deployment installation test of kargo and kubeadm.
 All is done provisioning centos 7.x servers for each job on digitalocean, but I run tests on bare metal too.
 
 Actually I do it running a java application from windows, macos or linux:

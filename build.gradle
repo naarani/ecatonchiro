@@ -52,7 +52,7 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDirs = ['ssh', 'test', 'jclouds']
+            srcDirs = ['ssh', 'test', 'jclouds', 'migrationInProgress']
         }
     }
 }

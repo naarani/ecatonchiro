@@ -88,7 +88,7 @@ public class CreateUserAndSudoCentos {
 			
 			
 			
-			// valida il lavoro
+			// check all
 			SshServerManager s2 = new SshServerManager( userToCreate + "@" + testhost, fileRef.getAbsolutePath(), sshkeylock, userPwd ); 
 			assertTrue( "should call for valid sshkey", s2.connect() == ExecutionStatus.Done );
 			assertTrue( "should test new user with sshkey", ExecutionStatus.Done == s2.command( "ls -l" ) );

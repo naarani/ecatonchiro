@@ -78,7 +78,7 @@ public class CreateUserAndSudoCentos {
 			SshServerManager s = new SshServerManager( userToCreate + "@" + testhost, userPwd );
 			assertTrue( "should call for valid password", s.connect() == ExecutionStatus.Done );
 
-			String file = "testTemp/chiave" + userToCreate;
+			String file = "private/test/key" + userToCreate;
 			File fileRef = new File( file );
 			if( !fileRef.exists() ){
 				assertTrue( "should create key", ExecutionStatus.Done == userLib.generateSshKey( file, s, sshkeylock ) );

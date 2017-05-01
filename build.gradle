@@ -9,7 +9,7 @@ apply plugin: 'eclipse'
 
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-mainClassName="org.naarani.selenev"
+mainClassName="org.naarani.selenev.Run"
 
 task wrapper(type: Wrapper) {
     gradleVersion = '3.4.1'
@@ -55,4 +55,24 @@ sourceSets {
             srcDirs = ['ssh', 'test', 'jclouds', 'migrationInProgress']
         }
     }
+}
+
+jar.doFirst {
+	// exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'    
+    manifest{
+        attributes(
+		    'Specification-Version': version.replace('-SNAPSHOT', '')
+		    , 'Implementation-Version': version
+	        , 'Class-Path': configurations.compile.collect { 'lib/' + it.getName() }.join(' ')
+		    , 'Main-Class': 'org.naarani.selenev.Run'
+        )
+    } 
+}
+
+task jarWithLib(type: Sync){
+    dependsOn assemble
+	def dirName = "build/libs/lib"
+    file(dirName).mkdirs()
+    from configurations.runtime
+    into 'build/libs/lib'
 }

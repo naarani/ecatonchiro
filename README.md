@@ -20,6 +20,7 @@ this is Selene V.
 ## Overview
 pre alpha, not working now...
 
+[Roadmap](https://github.com/naarani/selenev/wiki/roadmap)
 
 
 ## Main Dependencies 

@@ -159,6 +159,7 @@ public class UserLibCentos implements IUserLib {
 	public ExecutionStatus generateSshKey( String filename, SshServerManager svr, byte[] unlockIdentity ){
 		try {
 			KeyPair kpair = KeyPair.genKeyPair( svr.getJsch(), KeyPair.RSA ); // ONLY USE RsA the other is DEPRECATED for security reason
+			new File( filename ).getParentFile().mkdirs();
 			if( unlockIdentity == null ){
 				kpair.writePrivateKey( filename );
 			} else {

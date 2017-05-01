@@ -28,7 +28,8 @@ public class DefaultStreamLog extends OutputStream {
 
 	@Override
 	public void write( byte[] buffer, int start, int len ) throws IOException {
-		writeMsg( new String( buffer, start, len, "UTF8" ) );
+		String msg = new String( buffer, start, len, "UTF8" );
+		writeMsg( msg );
 	}
 	
 	@Override

@@ -19,6 +19,8 @@ import com.jcraft.jsch.Session;
  * 1) doesn't manage KNOWN HOSTS
  * 2) scpfrom doesnt manage multiple files
  * 
+ * near all the features come from examples of JCraft: Copyright (c) 2002-2015 Atsuhiko Yamanaka, JCraft,Inc. All rights reserved.
+ * 
  * 
  * 
  */
@@ -92,7 +94,7 @@ public class SshServerManager {
 		return connTimeout;
 	}
 
-	protected DefaultStreamLog commandLogger = new DefaultStreamLog( false, true );
+	protected DefaultStreamLog commandLogger = new MaskerStreamLog( this, false, true );
 
 	public DefaultStreamLog getCmdLog() {
 		return commandLogger;
@@ -102,7 +104,7 @@ public class SshServerManager {
 		commandLogger = cmdLog;
 	}
 
-	protected DefaultStreamLog commandErrorLogger = new DefaultStreamLog( true, true );
+	protected DefaultStreamLog commandErrorLogger = new MaskerStreamLog( this, true, true );
 
 	public DefaultStreamLog getCmdErrLog() {
 		return commandErrorLogger;
@@ -195,8 +197,10 @@ public class SshServerManager {
 					commandLogger.write( tmp, 0, i );
 					if( doubleEcho ){
 						String masked = getCmdErrLog().getText();
-						masked = masked.replaceAll( sudoPwd, "##########" );
-						System.out.print( "ECHO: " + masked );
+						if( masked.length() != 0 ) {
+							masked = masked.replaceAll( sudoPwd, "##########" );
+							System.out.print( "ECHO: " + masked );
+						}
 					}
 				}
 				if( channel.isClosed() ){
@@ -222,8 +226,10 @@ public class SshServerManager {
 			channel.disconnect();
 			if( doubleEcho && getCmdErrLog().getText().trim().length() > 0 ){
 				String masked = getCmdErrLog().getText();
-				masked = masked.replaceAll( sudoPwd, "##########" );
-				System.out.print( "ECHO: " + masked );
+				if( masked.length() != 0 ) {
+					masked = masked.replaceAll( sudoPwd, "##########" );
+					System.out.print( "ECHO: " + masked );
+				}
 			}
 			return status; // ref != -1;
 		} catch ( JSchException | IOException e ){

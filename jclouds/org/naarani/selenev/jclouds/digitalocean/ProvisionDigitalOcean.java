@@ -10,7 +10,6 @@ import org.jclouds.apis.Apis;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.config.ComputeServiceProperties;
 import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.compute.options.TemplateOptions;
 import org.jclouds.digitalocean2.compute.options.DigitalOcean2TemplateOptions;
@@ -147,10 +146,31 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 			UserModel user = new UserModel();
 			IncludeVars v2 = new IncludeVars();
 			File fileYaml = new File( prv, "usermodel.yaml" );
-			v2.addFile( fileYaml );
-			HashMap h2 = v2.getVars();
+			if( !fileYaml.getParentFile().exists() ){
+				fileYaml.getParentFile().mkdirs();
+			}
+			HashMap h2 = null;
+			try {
+				v2.addFile( fileYaml );
+				h2 = v2.getVars();
+			} catch (Exception e) {
+				h2 = new HashMap();
+			}
 			user.rootLikeUser = (String) h2.get( "rootLikeUser" );
+			if( user.rootLikeUser == null ) {
+				user.rootLikeUser = "root";
+				// SAVE YAML
+				updateYaml( fileYaml, h2 );
+			}
+			if( user.rootLikeUser.trim().length() == 0 ) {
+				user.rootLikeUser = "root";
+				// SAVE YAML
+				updateYaml( fileYaml, h2 );
+			}
 			user.rootLikePassword = (String) h2.get( "rootLikePassword" );
+			if( user.rootLikePassword == null ){
+				user.rootLikePassword = "";
+			}
 			if( user.rootLikePassword.trim().length() == 0 ) {
 				h2.put( "rootLikePassword", getSaltString( 12 ) );
 				user.rootLikePassword = (String) h2.get( "rootLikePassword" );

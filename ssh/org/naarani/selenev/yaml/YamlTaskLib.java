@@ -1,13 +1,14 @@
 package org.naarani.selenev.yaml;
 
-import java.io.BufferedReader;
+import java.io.BufferedReader; 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
 
@@ -45,7 +46,6 @@ public class YamlTaskLib {
 		Object object = reader.read();
 		if( object == null )
 			return false;
-
 	    lastItem = (ArrayList<Map<String,String>>)object;
 	    return true;
 	}
@@ -55,14 +55,17 @@ public class YamlTaskLib {
 	public void loadtasks() throws IOException {
 		tasks = new ArrayList<TaskAction>();
 		for( int i = 0; i < lastItem.size(); i++ ){
-			Map<String,String> map = (Map<String,String>)lastItem.get( i );
+			Map<String,?> map = (Map<String,?>)lastItem.get( i );
 			TaskAction t = new TaskAction();
-			t.setName( map.get( "name" ) );
-			String ref = map.get( "ignore_errors" );
+			t.setWorkdir( wk );
+			t.setName( map.get( "name" ).toString() );
+			Object ref = map.get( "ignore_errors" );
 			if( ref == null )
 				ref = "false";
-			t.setIgnoreErrors( Boolean.parseBoolean( ref ) );
-			t.setWhenClause( map.get( "when" ) );
+			t.setIgnoreErrors( Boolean.parseBoolean( ref.toString() ) );
+			if( map.get( "when" ) != null )
+				t.setWhenClause( map.get( "when" ).toString() );
+			// ACTION execution shuld based on WHEN clause
 			t.findAction( map );
 			tasks.add( t );
 		}
@@ -73,6 +76,16 @@ public class YamlTaskLib {
 			TaskAction  t = tasks.get( i );
 			System.out.println( "NAME [" + t.getAction() + "] : " + t.getName() );
 		}
+	}
+
+	protected File wk = new File( "." );
+	
+	public void setWorkdir( File wk ){
+		this.wk = wk;
+	}
+
+	public List<TaskAction> getTasks(){
+		return tasks;
 	}
 
 }

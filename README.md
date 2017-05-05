@@ -23,6 +23,16 @@ pre alpha, not working now...
 [Roadmap](https://github.com/naarani/selenev/wiki/roadmap)
 
 
+
+## Build jar
+to build the project run:
+
+_gradle --task jarWithLib_
+
+it will create in the _build/libs/_ directory the main jar runnable with all the needed jars in the directory _lib_ 
+
+
+
 ## Main Dependencies 
 
 1) JSCH (BSD-style license) Copyright (c) 2002-2015 Atsuhiko Yamanaka, JCraft,Inc. All rights reserved.

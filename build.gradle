@@ -41,6 +41,9 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.google.inject.extensions/guice-assistedinject
 	compile group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '4.1.0'
 
+	// https://mvnrepository.com/artifact/net.sf.jopt-simple/jopt-simple
+	compile group: 'net.sf.jopt-simple', name: 'jopt-simple', version: '5.0.3'
+
     // https://mvnrepository.com/artifact/com.esotericsoftware.yamlbeans/yamlbeans
 	compile group: 'com.esotericsoftware.yamlbeans', name: 'yamlbeans', version: '1.11'
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml

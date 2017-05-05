@@ -18,7 +18,10 @@ this is Selene V.
 
 
 ## Overview
-pre alpha, not working now...
+The application is in pre alpha stage:
+
+(2017/05/05) actually only provisiong server from DigitalOcean is working with yaml configurations files, as described in the wiki 
+
 
 [Roadmap](https://github.com/naarani/selenev/wiki/roadmap)
 

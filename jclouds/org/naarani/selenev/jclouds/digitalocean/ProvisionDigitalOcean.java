@@ -86,7 +86,7 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 	public Set<? extends NodeMetadata> exec( String[] args, String prv, String wk ) throws Exception {
 		OptionParser parser = super.basicParser();
         //
-        parser.accepts( "size" ).withRequiredArg().describedAs( "Number of server to instance" ).defaultsTo( "1" ).ofType( Integer.class );
+        parser.accepts( "nr" ).withRequiredArg().describedAs( "Number of server to instance" ).defaultsTo( "1" ).ofType( Integer.class );
         parser.accepts( "distro" ).withRequiredArg().describedAs( "Distro as from cloud list" ).defaultsTo( "fra1/centos-7-x64" );
         parser.accepts( "region" ).withRequiredArg().describedAs( "Region as from cloud list" ).defaultsTo( "fra1" );
         parser.accepts( "hardware" ).withRequiredArg().describedAs( "Hardware as from cloud list" ).defaultsTo( "2g" );

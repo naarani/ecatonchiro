@@ -11,5 +11,5 @@
   hosts: all
   
 - name: create sudoer user
-  user: --name workeruser --sudoer --addssh -pwd  {{ workUserPwd }}
+  user: --name workeruser --sudoer --generate_ssh_key --public_ssh_private_key --password  {{ workUserPwd }}
   

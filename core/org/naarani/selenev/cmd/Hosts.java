@@ -2,13 +2,16 @@ package org.naarani.selenev.cmd;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.naarani.selenev.Engine;
 import org.naarani.selenev.Host;
 import org.naarani.selenev.HostDataFilter;
 import org.naarani.selenev.ssh.SshServerManager;
@@ -16,7 +19,9 @@ import org.naarani.selenev.ssh.SshServerManager;
 import it.andreascarpino.ansible.inventory.type.AnsibleGroup;
 import it.andreascarpino.ansible.inventory.type.AnsibleHost;
 import it.andreascarpino.ansible.inventory.type.AnsibleInventory;
+import it.andreascarpino.ansible.inventory.type.AnsibleVariable;
 import it.andreascarpino.ansible.inventory.util.AnsibleInventoryReader;
+import it.andreascarpino.ansible.inventory.util.AnsibleInventoryWriter;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
@@ -53,22 +58,29 @@ public class Hosts extends ASelenevCmd {
 	        	if( f == null ){
 	        		// no fix needed
 	        	} else {
-			        int a = 0;
-			        a++; // TODO
+			        AnsibleInventory inv = new AnsibleInventory();
+	        		if( hosts.exists() ){
+				        inv = getHostsInventory( hosts );
+	        		} else {
+	        			if( f.length == 0 ){
+	        				return null;
+	        			}
+	        		}
+	        		for( int i = 0; i < f.length; i++ ){
+	        			File f1 = f[i];
+	        			Map map = (Map)Engine.loadYaml( f1 );
+	        			String hostname = (String)map.get( "hostname" );
+	        			AnsibleHost h3 = new AnsibleHost( hostname );
+	        			h3.addVariable( new AnsibleVariable( "ansible_host", (String)map.get( "ip.public" ) ) );
+	        			h3.addVariable( new AnsibleVariable( "ansible_port", "22" ) );
+	        			h3.addVariable( new AnsibleVariable( "ansible_user", "root" ) );
+		        		inv.addHost( h3 );
+	        		}
+	        		saveHostsInventory( hosts, inv );
 			        return null;
 	        	}
 	        } else {
-		        String body = "";
-		        FileInputStream in = new FileInputStream( hosts );
-		        int size = 0;
-		        byte[] buffer = new byte[2048];
-		        while( ( size = in.read( buffer, 0, buffer.length ) ) != -1 ) {
-		        	body += new String( buffer, 0, size );
-		        }
-		        in.close();
-		        body = body.replace( "selenev", "ansible" );
-		        //
-		        AnsibleInventory inv = AnsibleInventoryReader.read( body );
+		        AnsibleInventory inv = getHostsInventory( hosts );
 		        //
 		        boolean list = options.has( "list" );
 		        if( list ){
@@ -143,6 +155,29 @@ public class Hosts extends ASelenevCmd {
 	        }
 	        return null;
 		}
+	}
+
+	private AnsibleInventory getHostsInventory( File hosts ) throws IOException {
+    	String body = "";
+        FileInputStream in = new FileInputStream( hosts );
+        int size = 0;
+        byte[] buffer = new byte[2048];
+        while( ( size = in.read( buffer, 0, buffer.length ) ) != -1 ) {
+        	body += new String( buffer, 0, size );
+        }
+        in.close();
+        body = body.replace( "selenev", "ansible" );
+        AnsibleInventory inv = AnsibleInventoryReader.read( body );
+        return inv;
+	}
+
+	private void saveHostsInventory( File hosts, AnsibleInventory inv ) throws IOException {
+        String body = AnsibleInventoryWriter.write( inv );
+    	body = body.replace( "ansible", "selenev" );
+        //
+    	FileOutputStream ou = new FileOutputStream( hosts );
+    	ou.write( body.getBytes() );
+        ou.close();
 	}
 
 	private String getKey( String prv, String user ) throws IOException {

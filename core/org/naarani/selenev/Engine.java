@@ -1,6 +1,7 @@
 package org.naarani.selenev;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,14 +23,16 @@ import org.naarani.selenev.ssh.SshServerManager;
 import org.naarani.selenev.yaml.IncludeVars;
 import org.naarani.selenev.yaml.TaskAction;
 import org.naarani.selenev.yaml.YamlTaskLib;
+
+import com.esotericsoftware.yamlbeans.YamlReader;
 import com.esotericsoftware.yamlbeans.YamlWriter;
 
 public class Engine {
 
 	static protected Logger logger = Logger.getLogger( Engine.class );
 
-	protected int connectionRetry = 2;
-	protected int connectionRetryPause = 0;
+	protected int connectionRetry = 3;
+	protected int connectionRetryPause = 1000 * 10;
 	
 	protected String main;
 	protected File wk;
@@ -73,8 +76,7 @@ public class Engine {
 	public void run(){
 		System.out.println( "setup embedded vars" );
 		vars = new HashMap();
-		vars.put( "nohosts", !new File( prv, "hosts" ).exists() 
-				&& new File( wk, "hostdata" ).listFiles( new HostDataFilter() ) == null );
+		vars.put( "nohosts", !new File( prv, "hosts" ).exists() && new File( wk, "hostdata" ).listFiles( new HostDataFilter() ).length == 0 );
 		try {
 			File secrets = new File( prv, "secrets.yaml" );
 			if( secrets.exists() ) {
@@ -201,12 +203,13 @@ public class Engine {
 							if( connectionRetry == r )
 								break;
 							r++;
+							Thread.sleep( connectionRetryPause );
 							continue;
 						}
 						break;
 					}
 					if( status != ExecutionStatus.Done ){
-						throw new StopAction( "Cannot connect to sever nr " + ( i + 1 ) );
+						throw new StopAction( "Cannot connect to server nr " + ( i + 1 ) + ": " + status );
 					}
 				}
 				hcmd = new User();
@@ -330,6 +333,13 @@ public class Engine {
 		YamlWriter writer = new YamlWriter( new FileWriter( fileYaml ) );
 		writer.write( item );
 		writer.close();
+	}
+
+	static public Object loadYaml( File fileYaml ) throws IOException {
+		YamlReader reader = new YamlReader( new FileReader( fileYaml ) );
+		Object o = reader.read();
+		reader.close();
+		return o;
 	}
 
 }

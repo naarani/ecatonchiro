@@ -209,6 +209,35 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 				// SAVE YAML
 			    Engine.updateYaml( fileYaml, h2 );
 			}
+
+			
+			tmpText = (String) h2.get( "sshPublicKey" );
+			if( tmpText == null ){
+				tmpText = "";
+			}
+			if( tmpText.trim().length() != 0 ){
+				user.sshPublicKey = new String( Base64.getDecoder().decode( tmpText ) );
+			}
+			if( tmpText.trim().length() == 0 ){
+				File tmpFile = new File( prv, "users" );
+				tmpFile.mkdirs();
+				//
+			    InputStream in = new FileInputStream( new File( tmpFile, "key_" + user.rootLikeUser + ".pub" ) );
+			    int sizeBB = 0;
+			    byte[] buffer = new byte[2048];
+			    String key = "";
+			    while( ( sizeBB = in.read( buffer,  0, 2048 ) ) != -1 ){
+			    	key += new String( buffer, 0, sizeBB );
+			    }
+			    in.close();
+			    h2.put( "sshPublicKey", Base64.getEncoder().encodeToString( key.getBytes() ) );
+			    user.sshPublicKey = new String( Base64.getDecoder().decode( (String) h2.get( "sshPublicKey" ) ) );
+				// SAVE YAML
+			    Engine.updateYaml( fileYaml, h2 );
+			}
+			
+			
+			
 			if( user.rootLikeUser == null || user.rootLikePassword == null ){
 				throw new StopAction( "NULL VAR: UserModel" );
 			}
@@ -248,6 +277,7 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
                 .options( opts.as( DigitalOcean2TemplateOptions.class ).privateNetworking( provisioning.privatNetworking )
                 		.nodeNames( nodeNames ).tags( tags ).overrideLoginUser( user.rootLikeUser )
                 		.overrideLoginPassword( user.rootLikePassword )
+                		.authorizePublicKey( user.sshPublicKey )
                 		.overrideLoginPrivateKey( user.sshPrivateKey )
                 ).build();
 		//
@@ -289,7 +319,7 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 	            */
 			}
 		}
-        setupSshkey( nodi, user, prv );
+        waitRunning( nodi, user, prv );
         try {
 	    	Closeables.close( computeService.getContext(), true );
 		} catch ( IOException e ){
@@ -300,7 +330,7 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 	    return nodi;
 	}
 
-	private void setupSshkey(Set<? extends NodeMetadata> nodi, UserModel user, File prv ){
+	private void waitRunning(Set<? extends NodeMetadata> nodi, UserModel user, File prv ){
 		try {
 			while( true ){
 				logger.info( "waiting for server..." );

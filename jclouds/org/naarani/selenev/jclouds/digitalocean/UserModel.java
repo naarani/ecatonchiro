@@ -5,5 +5,6 @@ public class UserModel {
 	String rootLikeUser;
 	String rootLikePassword;
 	String sshPrivateKey;
+	String sshPublicKey;
 
 }

@@ -128,10 +128,27 @@ public class Engine {
 			logger.error( "TASK STOPPED: " + main, e );
 		} catch( Exception e ) {
 			logger.error( "generic error in " + main, e );
+		} finally {
+			closeAllConnections();
 		}
 		System.out.println( "" );
 		System.out.println( "[ TASK done " + cmdDone + ", skipped " + cmdSkipped + ", errors " + cmdErrors + " ]");
 		System.out.println( "" );
+	}
+
+	private void closeAllConnections(){
+		List<SshServerManager> hosts = (List<SshServerManager>) vars.get( "hosts" );
+		if( hosts != null ) {
+			for( int i = 0; i < hosts.size(); i++ ){
+				try {
+					SshServerManager ssh = hosts.get( i );
+					if( ssh.isConnected() )
+						ssh.close();
+		        } catch ( Exception e ){
+		        	logger.error( "error closing connection", e );
+		        }
+			}
+		}
 	}
 
 	protected HashMap vars = new HashMap();
@@ -168,6 +185,8 @@ public class Engine {
 		case "user":
 			for( int i = 0; i < hosts.size(); i++ ){
 				SshServerManager ssh = hosts.get( i );
+				if( !ssh.isConnected() )
+					ssh.connect();
 				hcmd = new User();
 				execution( t, hcmd, ssh );
 			}

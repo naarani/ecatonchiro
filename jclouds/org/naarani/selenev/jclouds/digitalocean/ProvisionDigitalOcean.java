@@ -2,7 +2,6 @@ package org.naarani.selenev.jclouds.digitalocean;
 
 import java.util.Properties;
 import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.jclouds.ContextBuilder;
 import org.jclouds.apis.ApiMetadata;
@@ -17,8 +16,6 @@ import org.jclouds.digitalocean2.compute.options.DigitalOcean2TemplateOptions;
 import org.jclouds.logging.log4j.config.Log4JLoggingModule;
 import org.jclouds.providers.ProviderMetadata;
 import org.jclouds.providers.Providers;
-
-import com.esotericsoftware.yamlbeans.YamlWriter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -26,7 +23,6 @@ import com.google.common.io.Closeables;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
@@ -38,6 +34,7 @@ import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.RunNodesException; 
 import org.jclouds.sshj.config.SshjSshClientModule;
 import org.naarani.core.exceptions.StopAction;
+import org.naarani.selenev.Engine;
 import org.naarani.selenev.cmd.ASelenevCmd;
 import org.naarani.selenev.ssh.ExecutionStatus;
 import org.naarani.selenev.ssh.SshServerManager;
@@ -62,8 +59,8 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 	protected UserModel usermodel;
 	
 	@Deprecated
-	public Set<? extends NodeMetadata> buildDroplet( DoToken token, String serverDistro, int size, String ROOT_PASSWORD
-			, String serverTagName, File workdir, File prv ) throws RunNodesException, IOException {
+	public Set<? extends NodeMetadata> buildDroplet( DoToken token, String serverDistro, int nr, String ROOT_PASSWORD
+			, String serverTagName, File workdir, File prv ) throws RunNodesException, IOException, StopAction {
 		//
 		Provisioning prov = new Provisioning();
 		prov.servetTag = new String[] { serverTagName };
@@ -79,7 +76,7 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 		usermodel.rootLikePassword = ROOT_PASSWORD;
 		usermodel.sshPrivateKey = "";
 		//
-		return buildDroplet( token, prov, usermodel, size, workdir, prv );
+		return buildDroplet( token, prov, usermodel, nr, workdir, prv );
 	}
 
 	@Override
@@ -121,15 +118,15 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 			} else {
 				provisioning.servetTag = new String[0];
 			}
-	        int size = (Integer) options.valueOf( "size" );
-	        provisioning.serverName = new String[size];
+	        int nr = (Integer) options.valueOf( "nr" );
+	        provisioning.serverName = new String[nr];
 	        String ref;
 	        if( options.has( "serverName" ) ) {
 	        	ref = (String)options.valueOf( "serverName" );
 			} else {
 	        	ref = "SELV-"+ getSaltString( 10 ).toUpperCase() + "-";
 			}
-	        for( int i = 0; i < size; i++ ){
+	        for( int i = 0; i < nr; i++ ){
 	        	provisioning.serverName[i] = ref + i;
 			}
 			// DO API TOKEN MANAGEMENT
@@ -160,12 +157,12 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 			if( user.rootLikeUser == null ) {
 				user.rootLikeUser = "root";
 				// SAVE YAML
-				updateYaml( fileYaml, h2 );
+				Engine.updateYaml( fileYaml, h2 );
 			}
 			if( user.rootLikeUser.trim().length() == 0 ) {
 				user.rootLikeUser = "root";
 				// SAVE YAML
-				updateYaml( fileYaml, h2 );
+				Engine.updateYaml( fileYaml, h2 );
 			}
 			user.rootLikePassword = (String) h2.get( "rootLikePassword" );
 			if( user.rootLikePassword == null ){
@@ -175,7 +172,7 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 				h2.put( "rootLikePassword", getSaltString( 12 ) );
 				user.rootLikePassword = (String) h2.get( "rootLikePassword" );
 				// SAVE YAML
-				updateYaml( fileYaml, h2 );
+				Engine.updateYaml( fileYaml, h2 );
 			}
 			String tmpText = (String) h2.get( "sshPrivateKey" );
 			if( tmpText == null ){
@@ -210,7 +207,7 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 			    h2.put( "sshPrivateKey", Base64.getEncoder().encodeToString( key.getBytes() ) );
 			    user.sshPrivateKey = new String( Base64.getDecoder().decode( (String) h2.get( "sshPrivateKey" ) ) );
 				// SAVE YAML
-				updateYaml( fileYaml, h2 );
+			    Engine.updateYaml( fileYaml, h2 );
 			}
 			if( user.rootLikeUser == null || user.rootLikePassword == null ){
 				throw new StopAction( "NULL VAR: UserModel" );
@@ -219,18 +216,12 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 				throw new StopAction( "EMPTY VAR: UserModel" );
 			}
 			// RUN RUN RUN...
-			return buildDroplet( token, provisioning, user, size, new File( wk ), new File( prv ) );
+			return buildDroplet( token, provisioning, user, nr, new File( wk ), new File( prv ) );
 		}
 	}
 
-	private void updateYaml( File fileYaml, HashMap h2 ) throws IOException {
-		YamlWriter writer = new YamlWriter( new FileWriter( fileYaml ) );
-		writer.write( h2 );
-		writer.close();
-	}
-
-	public Set<? extends NodeMetadata> buildDroplet( DoToken token, Provisioning provisioning, UserModel user, int size
-			, File workdir, File prv ) throws RunNodesException, IOException {
+	public Set<? extends NodeMetadata> buildDroplet( DoToken token, Provisioning provisioning, UserModel user, int nr
+			, File workdir, File prv ) throws RunNodesException, IOException, StopAction {
 		this.provisioning = provisioning;
 		this.usermodel = user;
 		//
@@ -241,7 +232,7 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 		dropletPath = new File( workdir, "hostdata" );
 		dropletPath.mkdirs();
 		//
-		logger.debug( "requested nodes: " + size );
+		logger.debug( "requested nodes: " + nr );
 		//
 		ImmutableSet<Module> modules = ImmutableSet.<Module> of(new SshjSshClientModule(), new Log4JLoggingModule());
 		ComputeServiceContext context = ContextBuilder.newBuilder("digitalocean2").credentials( token.name, token.token )
@@ -261,9 +252,9 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
                 ).build();
 		//
         String NAME = "cluster";
-        Set<? extends NodeMetadata> nodi = computeService.createNodesInGroup( NAME, size, template );
+        Set<? extends NodeMetadata> nodi = computeService.createNodesInGroup( NAME, nr, template );
         Iterator<? extends NodeMetadata> noit = nodi.iterator();
-		logger.debug( "nodes available: " + size );
+		logger.debug( "nodes available: " + nodi.size() );
         //
         if( workdir != null ){
 	        dropletPath.mkdirs();	
@@ -285,7 +276,7 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 	        	table.put( "tags", ref.getTags().toString() );
 	        	table.put( "imageId", ref.getImageId() );
 	        	File file = new File( dropletPath, "svr_" + ref.getHostname() + "_" + ref.getPublicAddresses().toArray()[0].toString() + ".yaml" );
-	        	updateYaml( file, table );
+	        	Engine.updateYaml( file, table );
 	        	/*
 	        	ou.write( ( ref.getHostname() + "   " + ref.getPublicAddresses().toArray()[0].toString() + "\r\n" ).getBytes() );
 	        	ou.write( ( ref.getHostname() + "   " + ref.getPrivateAddresses().toArray()[0].toString() + "\r\n" ).getBytes() );
@@ -304,6 +295,8 @@ public class ProvisionDigitalOcean extends ASelenevCmd {
 		} catch ( IOException e ){
 			logger.error( "error closing COMPUTESERVICE", e );
 		}
+		if( nodi.size() != nr )
+			throw new StopAction( "Requested " + nr + ", but instanced "+ nodi.size() + " servers..." );
 	    return nodi;
 	}
 

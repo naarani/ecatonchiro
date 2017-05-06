@@ -1,0 +1,15 @@
+#conditional server creation, then sudoer creation
+
+- name: provision server
+  provisionDigitalOcean: --nr 1 --region fra1 --distro fra1/centos-7-x64 --hardware 512mb
+  when: "{{ nohosts }}"
+
+- name: build/update hosts from hostdata directory
+  hosts: --build
+  
+- name: select host to apply next tasks
+  hosts: all
+  
+- name: create sudoer user
+  user: --name workeruser --sudoer --addssh -pwd  {{ workUserPwd }}
+  

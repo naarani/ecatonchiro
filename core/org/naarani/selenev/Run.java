@@ -1,18 +1,13 @@
 package org.naarani.selenev;
 
-import java.io.File;
 import java.io.IOException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import joptsimple.OptionSpec;
 
 public class Run {
 
 	public static void main( String[] args ) throws IOException {
 		OptionParser parser = new OptionParser();
-		// parser.accepts( "flag" );
-		// parser.accepts( "count" ).withRequiredArg().ofType( Integer.class );
-		// parser.accepts( "level" ).withOptionalArg().ofType( Level.class );
         parser.accepts( "prv" ).withRequiredArg().describedAs( "Vault" ).defaultsTo( "private" );
         parser.accepts( "wk" ).withRequiredArg().describedAs( "Workspace" ).defaultsTo( "workspace/production" );
         parser.accepts( "test", "Only list tast, not run 'em" );
@@ -26,7 +21,6 @@ public class Run {
 			parser.printHelpOn( System.out );
 		} else {
 			org.apache.log4j.BasicConfigurator.configure();
-			// parser.printHelpOn( System.out );
 			// --------------------------------------------------------------------
 	        OptionSet options = parser.parse( args );
 	        boolean demo = options.has( "demo" );

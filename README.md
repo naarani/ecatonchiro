@@ -28,11 +28,20 @@ The application is in pre alpha stage:
 
 
 ## Build jar
+
 to build the project run:
 
-_gradle --task jarWithLib_
+    $ git clone https://github.com/naarani/selenev.git
+    $ cd selenev
+    $ gradle --task jarWithLib
 
 it will create in the _build/libs/_ directory the main jar runnable with all the needed jars in the directory _lib_ 
+
+
+
+## License
+
+Apache 2.0 
 
 
 
@@ -44,6 +53,7 @@ it will create in the _build/libs/_ directory the main jar runnable with all the
 
 3) yamlbean EsotericSoftware/yamlbeans is licensed under the MIT License
 
+4) ansible-inventory-java MIT license (c) Andrea Scarpino
 
 
 ## Sponsor

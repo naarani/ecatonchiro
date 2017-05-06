@@ -49,13 +49,16 @@ dependencies {
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
 	// compile group: 'org.yaml', name: 'snakeyaml', version: '1.18'
     
+    compile fileTree(dir: 'lib', include: ['*.jar'])
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    
     testCompile "junit:junit:4.12"    
 }
 
 sourceSets {
     main {
         java {
-            srcDirs = ['ssh', 'test', 'jclouds', 'migrationInProgress']
+            srcDirs = ['core', 'test', 'jclouds', 'migrationInProgress']
         }
     }
 }

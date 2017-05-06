@@ -66,26 +66,9 @@ public class Hosts extends ASelenevCmd {
 		        	body += new String( buffer, 0, size );
 		        }
 		        in.close();
-		        //
 		        body = body.replace( "selenev", "ansible" );
 		        //
 		        AnsibleInventory inv = AnsibleInventoryReader.read( body );
-		        for( Iterator<AnsibleGroup>iterator = inv.getGroups().iterator(); iterator.hasNext(); ){
-		        	AnsibleGroup group = iterator.next();
-			        for( Iterator<AnsibleHost> it2 = group.getHosts().iterator(); it2.hasNext(); ){
-			        	AnsibleHost singleHost = it2.next();
-			        	if( singleHost.getName().compareTo( "---" ) == 0 )
-			        		break;
-			        	Host host = new Host();
-			        	host.name = singleHost.getName();
-			        	host.ip = (String)singleHost.getVariable( "ansible_host" ).getValue();
-			        	String ref = (String)singleHost.getVariable( "ansible_port" ).getValue();
-			        	if( ref != null )
-			        		host.sshport = Integer.parseInt( ref );
-			        	host.sshUser = (String)singleHost.getVariable( "ansible_user" ).getValue();
-			        	System.out.println( host );
-					}
-				}
 		        //
 		        boolean list = options.has( "list" );
 		        if( list ){
@@ -144,10 +127,11 @@ public class Hosts extends ASelenevCmd {
 				        	Host h1 = sum.get( i );
 				        	SshServerManager ssh1;
 							String privateKey = getKey( prv, h1.sshUser );
-							if( privateKey == null )
+							if( privateKey == null ){
 				        		ssh1 = new SshServerManager( h1.sshUser + "@" + h1.ip, pwd );
-				        	else
-				        		ssh1 = new SshServerManager( h1.sshUser + "@" + h1.ip, privateKey, unlock.getBytes(), pwd );
+							} else {
+				        		ssh1 = new SshServerManager( h1.sshUser + "@" + h1.ip, privateKey, unlock == null ? null : unlock.getBytes(), pwd );
+							}
 							ssh.add( ssh1 );
 						}
 				        return ssh;

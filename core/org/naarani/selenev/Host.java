@@ -11,7 +11,7 @@ public class Host {
 	public String sshUser;
 
 	public String toString(){
-		return "\"" + name + "\\\" " + sshUser + "@" + ip + ":" + sshport;
+		return "\"" + name + "\" " + sshUser + "@" + ip + ":" + sshport;
 	}
 	
 }

@@ -22,6 +22,7 @@ public class User extends ASelenevHostCmd {
         parser.accepts( "generate_ssh_key", "Generate a SSH key for the user in question" );
         parser.accepts( "public_ssh_private_key", "Public private key inside user account" );
         parser.accepts( "ssh_key_passphrase", "Set the passphrase for the SSH key" ).withRequiredArg();
+        parser.accepts( "sudoer", "Enable user to run sudo" );
         //
 		if( args.length == 0 ){
 			// zeroHelp( parser );

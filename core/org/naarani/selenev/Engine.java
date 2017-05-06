@@ -3,6 +3,7 @@ package org.naarani.selenev;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -16,6 +17,7 @@ import org.naarani.selenev.cmd.ASelenevHostCmd;
 import org.naarani.selenev.cmd.Hosts;
 import org.naarani.selenev.cmd.User;
 import org.naarani.selenev.jclouds.digitalocean.ProvisionDigitalOcean;
+import org.naarani.selenev.ssh.ExecutionStatus;
 import org.naarani.selenev.ssh.SshServerManager;
 import org.naarani.selenev.yaml.IncludeVars;
 import org.naarani.selenev.yaml.TaskAction;
@@ -26,6 +28,9 @@ public class Engine {
 
 	static protected Logger logger = Logger.getLogger( Engine.class );
 
+	protected int connectionRetry = 2;
+	protected int connectionRetryPause = 0;
+	
 	protected String main;
 	protected File wk;
 	protected File prv;
@@ -112,11 +117,12 @@ public class Engine {
 							}
 							System.out.println( "" );
 						} catch ( Exception e ){
-							System.out.println( "   Error " );
 							cmdErrors ++;
 							if( t.isIgnoreErrors() ){
+								System.out.println( "   Error " );
 								
 							} else {
+								System.out.println( "   Fatal error " );
 								// logger.error( "Output [" + t.getName() + "] on ", e );
 								throw e;
 							}
@@ -185,8 +191,24 @@ public class Engine {
 		case "user":
 			for( int i = 0; i < hosts.size(); i++ ){
 				SshServerManager ssh = hosts.get( i );
-				if( !ssh.isConnected() )
-					ssh.connect();
+				if( !ssh.isConnected() ){
+					int r = 0;
+					ExecutionStatus status = null;
+					while( true ){
+						System.out.println( "... connecting to server nr  " + ( i + 1 ) + "/" + hosts.size()  ); // + hosts.get( i ) );
+						status = ssh.connect();
+						if( status != ExecutionStatus.Done ){
+							if( connectionRetry == r )
+								break;
+							r++;
+							continue;
+						}
+						break;
+					}
+					if( status != ExecutionStatus.Done ){
+						throw new StopAction( "Cannot connect to sever nr " + ( i + 1 ) );
+					}
+				}
 				hcmd = new User();
 				execution( t, hcmd, ssh );
 			}
@@ -222,6 +244,8 @@ public class Engine {
 			args = evalVars( args );
 			Object o = executable.exec( args, prv.getAbsolutePath(), wk.getAbsolutePath() );
 			vars.put( t.getAction(), o );
+		} catch ( StopAction e ){
+			throw e;
 		} catch ( Exception e ){
 			throw new StopAction( "failure: " + e.getMessage(), e );
 		}
@@ -235,18 +259,34 @@ public class Engine {
 				args = new String[0];
 			} else {
 				StringTokenizer st = new StringTokenizer( (String)map, " " );
-				args = new String[ st.countTokens() ];
-				int i = 0;
-				while (st.hasMoreElements()) {
+				List<String> tmp = new ArrayList<String>();
+				while ( st.hasMoreElements() ){
 					String val = (String) st.nextElement();
-					args[ i ] = val;
-					i++;
+					if( tmp.size() > 1 ){
+						if( tmp.get( tmp.size() - 1 ).trim().compareTo( "{{" ) == 0 ){
+							String t1 = tmp.get( tmp.size() - 1 ) + val;
+							tmp.remove( tmp.size() -1 );
+							tmp.add( t1 );
+						} else if( val.trim().compareTo( "}}" ) == 0 ){
+							String t1 = tmp.get( tmp.size() - 1 ) + val;
+							tmp.remove( tmp.size() -1 );
+							tmp.add( t1 );
+						} else {
+							tmp.add( val );
+						}
+					} else {
+						tmp.add( val );
+					}
 				}
+				args = new String[ tmp.size() ];
+				tmp.toArray( args );
 			}
 			// if ARGS contains VARIABLES, resolve 'em BEFORE run TASK and passing ARGS
 			args = evalVars( args );
 			Object o = executable.exec( args, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh );
 			vars.put( t.getAction(), o );
+		} catch ( StopAction e ){
+			throw e;
 		} catch ( Exception e ){
 			throw new StopAction( "failure: " + e.getMessage(), e );
 		}

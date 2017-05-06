@@ -62,6 +62,10 @@ public class SshServerManager {
 		return jsch;
 	}
 
+	public String getHost(){
+		return host;
+	}
+
 	public String getUser(){
 		return user;
 	}

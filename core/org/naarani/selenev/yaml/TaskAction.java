@@ -2,7 +2,6 @@ package org.naarani.selenev.yaml;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;

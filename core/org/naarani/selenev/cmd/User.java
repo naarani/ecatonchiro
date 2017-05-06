@@ -51,7 +51,7 @@ public class User extends ASelenevHostCmd {
 			File f1 = new File( prv, "users/key_" + name );
 			File f2 = new File( prv, "users/key_" + name + ".pub" );
 			if( !f1.exists() ){
-				status = ul.generateSshKey( f1.getAbsolutePath(), svr, ssh_key_passphrase.getBytes() );
+				status = ul.generateSshKey( f1.getAbsolutePath(), svr, ssh_key_passphrase == null ? null : ssh_key_passphrase.getBytes() );
 				if( status != ExecutionStatus.Done )
 					return status;
 			}

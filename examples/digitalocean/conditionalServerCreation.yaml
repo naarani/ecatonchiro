@@ -8,8 +8,8 @@
   hosts: --build
   
 - name: select host to apply next tasks
-  hosts: all
+  hosts: all --password {{ rootLikePassword }}
   
 - name: create sudoer user
-  user: --name workeruser --sudoer --generate_ssh_key --public_ssh_private_key --password  {{ workUserPwd }}
+  user: --name workeruser --sudoer --generate_ssh_key --public_ssh_private_key --password {{ workUserPwd }}
   

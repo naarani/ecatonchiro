@@ -77,6 +77,18 @@ public class Engine {
 		System.out.println( "setup embedded vars" );
 		vars = new HashMap();
 		vars.put( "nohosts", !new File( prv, "hosts" ).exists() && new File( wk, "hostdata" ).listFiles( new HostDataFilter() ).length == 0 );
+		File fileYaml = new File( prv, "usermodel.yaml" );
+		if( fileYaml.exists() ){
+			IncludeVars v2 = new IncludeVars();
+			HashMap h2 = null;
+			try {
+				v2.addFile( fileYaml );
+				h2 = v2.getVars();
+				vars.putAll( h2 );
+			} catch (Exception e) {
+				h2 = new HashMap();
+			}
+		}
 		try {
 			File secrets = new File( prv, "secrets.yaml" );
 			if( secrets.exists() ) {
@@ -182,6 +194,19 @@ public class Engine {
 		case "provisionDigitalOcean":
 			cmd = new ProvisionDigitalOcean();
 			execution( t, cmd );
+			//
+			File fileYaml = new File( prv, "usermodel.yaml" );
+			if( fileYaml.exists() ){
+				IncludeVars v2 = new IncludeVars();
+				HashMap h2 = null;
+				try {
+					v2.addFile( fileYaml );
+					h2 = v2.getVars();
+					vars.putAll( h2 );
+				} catch (Exception e) {
+					h2 = new HashMap();
+				}
+			}
 			break;
 		case "hosts":
 			cmd = new Hosts();
@@ -235,13 +260,27 @@ public class Engine {
 				args = new String[0];
 			} else {
 				StringTokenizer st = new StringTokenizer( (String)map, " " );
-				args = new String[ st.countTokens() ];
-				int i = 0;
-				while (st.hasMoreElements()) {
+				List<String> tmp = new ArrayList<String>();
+				while ( st.hasMoreElements() ){
 					String val = (String) st.nextElement();
-					args[ i ] = val;
-					i++;
+					if( tmp.size() > 1 ){
+						if( tmp.get( tmp.size() - 1 ).trim().compareTo( "{{" ) == 0 ){
+							String t1 = tmp.get( tmp.size() - 1 ) + val;
+							tmp.remove( tmp.size() -1 );
+							tmp.add( t1 );
+						} else if( val.trim().compareTo( "}}" ) == 0 ){
+							String t1 = tmp.get( tmp.size() - 1 ) + val;
+							tmp.remove( tmp.size() -1 );
+							tmp.add( t1 );
+						} else {
+							tmp.add( val );
+						}
+					} else {
+						tmp.add( val );
+					}
 				}
+				args = new String[ tmp.size() ];
+				tmp.toArray( args );
 			}
 			// if ARGS contains VARIABLES, resolve 'em BEFORE run TASK and passing ARGS
 			args = evalVars( args );

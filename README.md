@@ -1,5 +1,13 @@
-# selene V
+# SELENE V
 (agentless) automation engine
+
+This is actually in alpha stage, if you're not a developer it's not still ready for you.
+
+At this stage there are already working scripts to provision server from digitalocean,
+run commands to create user and run shell:
+this from windows or macos or linux on a linux server
+
+This is a Java project, so you don't need specific instruction to install it on each platform ;-P
 
 
 
@@ -54,6 +62,7 @@ Apache 2.0
 3) yamlbean EsotericSoftware/yamlbeans is licensed under the MIT License
 
 4) ansible-inventory-java MIT license (c) Andrea Scarpino
+
 
 
 ## Sponsor

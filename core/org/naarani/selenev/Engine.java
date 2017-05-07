@@ -16,6 +16,7 @@ import org.naarani.core.exceptions.StopAction;
 import org.naarani.selenev.cmd.ASelenevCmd;
 import org.naarani.selenev.cmd.ASelenevHostCmd;
 import org.naarani.selenev.cmd.Hosts;
+import org.naarani.selenev.cmd.Shell;
 import org.naarani.selenev.cmd.User;
 import org.naarani.selenev.jclouds.digitalocean.ProvisionDigitalOcean;
 import org.naarani.selenev.ssh.ExecutionStatus;
@@ -72,7 +73,10 @@ public class Engine {
 	}
 
 	protected ScriptEngine se; 
+	protected List<TaskAction> tasks;
+	protected int tasksIndex;
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void run(){
 		System.out.println( "setup embedded vars" );
 		vars = new HashMap();
@@ -117,9 +121,10 @@ public class Engine {
 				if( demo ) { 
 					lib.showtasks();
 				} else {
-					List<TaskAction> tasks = lib.getTasks();
+					tasks = lib.getTasks();
 					for( int i = 0; i < tasks.size(); i++ ){
 						TaskAction t = tasks.get( i );
+						tasksIndex = i;
 						System.out.println( "TASK: [" + t.getName() + "]" );
 						try {
 							if( execute( t ) ){
@@ -156,7 +161,20 @@ public class Engine {
 		System.out.println( "" );
 	}
 
+	private void include( TaskAction t ) throws StopAction, IOException {
+		YamlTaskLib lib = new YamlTaskLib();
+		lib.setWorkdir( wk );
+		File file = new File( new File( main ).getParentFile(), getSingleLineCmd( t ) );
+		lib.setFile( file.getCanonicalPath() );
+		while( lib.next() ){
+			lib.loadtasks();
+			List<TaskAction> t2 = lib.getTasks();
+			tasks.addAll( tasksIndex + 1, t2 );
+		}
+	}
+
 	private void closeAllConnections(){
+		@SuppressWarnings("unchecked")
 		List<SshServerManager> hosts = (List<SshServerManager>) vars.get( "hosts" );
 		if( hosts != null ) {
 			for( int i = 0; i < hosts.size(); i++ ){
@@ -176,6 +194,7 @@ public class Engine {
 	protected boolean execute( TaskAction t ) throws Exception {
 		ASelenevCmd cmd;
 		ASelenevHostCmd hcmd;
+		@SuppressWarnings("unchecked")
 		List<SshServerManager> hosts = (List<SshServerManager>) vars.get( "hosts" );
 		String action = t.getAction();
 		String when = t.getWhenClause();
@@ -215,36 +234,77 @@ public class Engine {
 		case "include_vars":
 			include_vars( t );
 			break;
+		case "include":
+			include( t );
+			break;
 		case "user":
 			for( int i = 0; i < hosts.size(); i++ ){
-				SshServerManager ssh = hosts.get( i );
-				if( !ssh.isConnected() ){
-					int r = 0;
-					ExecutionStatus status = null;
-					while( true ){
-						System.out.println( "... connecting to server nr  " + ( i + 1 ) + "/" + hosts.size()  ); // + hosts.get( i ) );
-						status = ssh.connect();
-						if( status != ExecutionStatus.Done ){
-							if( connectionRetry == r )
-								break;
-							r++;
-							Thread.sleep( connectionRetryPause );
-							continue;
-						}
-						break;
-					}
-					if( status != ExecutionStatus.Done ){
-						throw new StopAction( "Cannot connect to server nr " + ( i + 1 ) + ": " + status );
-					}
-				}
+				SshServerManager ssh = getConnection( hosts, i );
 				hcmd = new User();
 				execution( t, hcmd, ssh );
+			}
+			break;
+		case "shell":
+			for( int i = 0; i < hosts.size(); i++ ){
+				SshServerManager ssh = getConnection( hosts, i );
+				Shell s = new Shell();
+				String command = getSingleLineCmd( t );
+				s.shell( command, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh, false );
+			}
+			break;
+		case "sudoShell":
+			for( int i = 0; i < hosts.size(); i++ ){
+				SshServerManager ssh = getConnection( hosts, i );
+				Shell s = new Shell();
+				String command = getSingleLineCmd( t );
+				s.shell( command, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh, true );
+			}
+			break;
+		case "yum":
+			for( int i = 0; i < hosts.size(); i++ ){
+				SshServerManager ssh = getConnection( hosts, i );
+				Shell s = new Shell();
+				String command = getSingleLineCmd( t );
+				s.yum( command, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh );
 			}
 			break;
 		default:
 			throw new StopAction( "unknown CMD " + action );
 		}
 		return true;
+	}
+
+	private String getSingleLineCmd( TaskAction t ) throws IOException, StopAction {
+		String cmd = (String) t.getVars().get( "CMD" );
+		if( cmd == null ) {
+			cmd = "";
+		}
+		cmd = evalVars( cmd );
+		return cmd;
+	}
+
+	private SshServerManager getConnection( List<SshServerManager> hosts, int i ) throws InterruptedException, StopAction {
+		SshServerManager ssh = hosts.get( i );
+		if( !ssh.isConnected() ){
+			int r = 0;
+			ExecutionStatus status = null;
+			while( true ){
+				System.out.println( "... connecting to server nr  " + ( i + 1 ) + "/" + hosts.size()  ); // + hosts.get( i ) );
+				status = ssh.connect();
+				if( status != ExecutionStatus.Done ){
+					if( connectionRetry == r )
+						break;
+					r++;
+					Thread.sleep( connectionRetryPause );
+					continue;
+				}
+				break;
+			}
+			if( status != ExecutionStatus.Done ){
+				throw new StopAction( "Cannot connect to server nr " + ( i + 1 ) + ": " + status );
+			}
+		}
+		return ssh;
 	}
 
 	private void include_vars( TaskAction t ) throws StopAction, IOException {

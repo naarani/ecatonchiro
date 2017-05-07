@@ -58,7 +58,9 @@ public class YamlTaskLib {
 			Map<String,?> map = (Map<String,?>)lastItem.get( i );
 			TaskAction t = new TaskAction();
 			t.setWorkdir( wk );
-			t.setName( map.get( "name" ).toString() );
+			String nam = (String)map.get( "name" );
+			nam = nam == null ? "..." : nam;
+			t.setName( nam );
 			Object ref = map.get( "ignore_errors" );
 			if( ref == null )
 				ref = "false";

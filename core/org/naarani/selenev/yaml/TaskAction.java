@@ -125,6 +125,14 @@ public class TaskAction {
 				setAction( "include_vars" );
 				listmap.remove( "include_vars" );
 				vars = IncludeVars.setup( this, listmap, map );
+			} else if( listmap.get( "shell" ) != null ){
+				setAction( "shell" );
+				listmap.remove( "shell" );
+				Object o = map.get( getAction() );
+				includedVars.put( "CMD", o );
+				if( listmap.get( "sudo" ) != null )
+					if( Boolean.parseBoolean( ( (String)map.get( "sudo" ) ).toLowerCase().replace( "yes", "true" ) ) )
+						setAction( "sudoShell" );
 			} else {
 				Iterator<String> s = listmap.keySet().iterator();
 				throw new IOException( "wrong action format [" + s.next() + ":" + s.next() + "] for name : " + name );

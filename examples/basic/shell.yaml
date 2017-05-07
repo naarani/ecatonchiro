@@ -1,0 +1,10 @@
+#need a s server...
+
+- include: ../digitalocean/conditionalServerCreation.yaml
+
+- name: ls ..
+  shell: ls -l 
+
+- name: sudo ls..
+  shell: ls /etc -l
+  sudo: yes

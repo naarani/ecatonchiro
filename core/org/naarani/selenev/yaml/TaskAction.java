@@ -18,6 +18,8 @@ public class TaskAction {
 	String whenClause;
 	String include_vars;
 	IncludeVars vars;
+	
+	boolean sudo;
 //	String environment;
 //	String register;
 
@@ -64,6 +66,14 @@ public class TaskAction {
 
 	public void setIgnoreErrors(boolean ignoreErrors){
 		this.ignoreErrors = ignoreErrors;
+	}
+
+	public boolean isSudo(){
+		return sudo;
+	}
+
+	public void setSudo(boolean sudo){
+		this.sudo = sudo;
 	}
 
 	public String getAction(){
@@ -125,17 +135,19 @@ public class TaskAction {
 				setAction( "include_vars" );
 				listmap.remove( "include_vars" );
 				vars = IncludeVars.setup( this, listmap, map );
-			} else if( listmap.get( "shell" ) != null ){
-				setAction( "shell" );
-				listmap.remove( "shell" );
-				Object o = map.get( getAction() );
-				includedVars.put( "CMD", o );
-				if( listmap.get( "sudo" ) != null )
-					if( Boolean.parseBoolean( ( (String)map.get( "sudo" ) ).toLowerCase().replace( "yes", "true" ) ) )
-						setAction( "sudoShell" );
 			} else {
-				Iterator<String> s = listmap.keySet().iterator();
-				throw new IOException( "wrong action format [" + s.next() + ":" + s.next() + "] for name : " + name );
+				if( listmap.get( "sudo" ) != null ) {
+					listmap.remove( "sudo" );
+					if( Boolean.parseBoolean( ( (String)map.get( "sudo" ) ).toLowerCase().replace( "yes", "true" ) ) ) {
+						setSudo( true );
+					}
+					setAction( listmap.keySet().iterator().next() );
+					Object o = map.get( getAction() );
+					includedVars.put( "CMD", o );
+				} else {
+					Iterator<String> s = listmap.keySet().iterator();
+					throw new IOException( "wrong action format [" + s.next() + ":" + s.next() + "] for name : " + name );
+				}
 			}
 		}
 	}

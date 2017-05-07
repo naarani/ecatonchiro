@@ -249,15 +249,7 @@ public class Engine {
 				SshServerManager ssh = getConnection( hosts, i );
 				Shell s = new Shell();
 				String command = getSingleLineCmd( t );
-				s.shell( command, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh, false );
-			}
-			break;
-		case "sudoShell":
-			for( int i = 0; i < hosts.size(); i++ ){
-				SshServerManager ssh = getConnection( hosts, i );
-				Shell s = new Shell();
-				String command = getSingleLineCmd( t );
-				s.shell( command, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh, true );
+				s.shell( command, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh, t.isSudo() );
 			}
 			break;
 		case "yum":

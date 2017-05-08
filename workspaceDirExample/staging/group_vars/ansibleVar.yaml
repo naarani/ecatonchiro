@@ -1,0 +1,2 @@
+verJINJA2: jinja2>=2.8,<2.9
+verANSIBLE: 2.2.1.0

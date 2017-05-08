@@ -67,6 +67,10 @@ public class YamlTaskLib {
 			t.setIgnoreErrors( Boolean.parseBoolean( ref.toString() ) );
 			if( map.get( "when" ) != null )
 				t.setWhenClause( map.get( "when" ).toString() );
+			if( map.get( "remote_user" ) != null )
+				t.setRemoteUser( map.get( "remote_user" ).toString() );
+			if( map.get( "remote_password" ) != null )
+				t.setRemotePwd( map.get( "remote_password" ).toString() );
 			// ACTION execution shuld based on WHEN clause
 			t.findAction( map );
 			tasks.add( t );

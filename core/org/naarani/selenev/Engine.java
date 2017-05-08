@@ -161,16 +161,21 @@ public class Engine {
 		System.out.println( "" );
 	}
 
-	private void include( TaskAction t ) throws StopAction, IOException {
-		YamlTaskLib lib = new YamlTaskLib();
-		lib.setWorkdir( wk );
-		File file = new File( new File( main ).getParentFile(), getSingleLineCmd( t ) );
-		lib.setFile( file.getCanonicalPath() );
-		while( lib.next() ){
-			lib.loadtasks();
-			List<TaskAction> t2 = lib.getTasks();
-			tasks.addAll( tasksIndex + 1, t2 );
-		}
+	private void include( TaskAction t ) throws StopAction {
+		File file = null;
+		try  {
+			YamlTaskLib lib = new YamlTaskLib();
+			lib.setWorkdir( wk );
+			file = new File( new File( main ).getParentFile(), getSingleLineCmd( t ) );
+			lib.setFile( file.getCanonicalPath() );
+			while( lib.next() ){
+				lib.loadtasks();
+				List<TaskAction> t2 = lib.getTasks();
+				tasks.addAll( tasksIndex + 1, t2 );
+			}
+        } catch ( Exception e ){
+        	throw new StopAction( "onInclude: " + file, e );
+        }
 	}
 
 	private void closeAllConnections(){
@@ -210,58 +215,67 @@ public class Engine {
 			}
 		}
 		switch ( action ){
-		case "provisionDigitalOcean":
-			cmd = new ProvisionDigitalOcean();
-			execution( t, cmd );
-			//
-			File fileYaml = new File( prv, "usermodel.yaml" );
-			if( fileYaml.exists() ){
-				IncludeVars v2 = new IncludeVars();
-				HashMap h2 = null;
-				try {
-					v2.addFile( fileYaml );
-					h2 = v2.getVars();
-					vars.putAll( h2 );
-				} catch (Exception e) {
-					h2 = new HashMap();
+			case "provisionDigitalOcean":
+				cmd = new ProvisionDigitalOcean();
+				execution( t, cmd );
+				//
+				File fileYaml = new File( prv, "usermodel.yaml" );
+				if( fileYaml.exists() ){
+					IncludeVars v2 = new IncludeVars();
+					HashMap h2 = null;
+					try {
+						v2.addFile( fileYaml );
+						h2 = v2.getVars();
+						vars.putAll( h2 );
+					} catch ( Exception e ){
+						h2 = new HashMap();
+					}
+				}
+				return true;
+			case "hosts":
+				// close all connection before map manipulation from hosts...
+				closeAllConnections();
+				cmd = new Hosts();
+				execution( t, cmd );
+				return true;
+			case "include_vars":
+				include_vars( t );
+				return true;
+			case "include":
+				include( t );
+				return true;
+		}
+		// if not exited...
+		ExecutionStatus status = null;
+		for( int i = 0; i < hosts.size(); i++ ){
+			String user = evalVars( t.getRemoteUser() );
+			String newPwd = evalVars( t.getRemotePwd() );
+			SshServerManager ssh = getConnection( hosts, i, user, newPwd );
+			switch ( action ){
+				case "user":
+					hcmd = new User();
+					status = execution( t, hcmd, ssh );
+					break;
+				case "shell":
+					Shell s = new Shell();
+					String command = getSingleLineCmd( t );
+					status = s.shell( command, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh, t.isSudo() );
+					break;
+				case "yum":
+					Shell s2 = new Shell();
+					String c2 = getSingleLineCmd( t );
+					status = s2.yum( c2, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh );
+					break;
+				default:
+					throw new StopAction( "unknown CMD " + action );
+			}
+			if( status != ExecutionStatus.Done ){
+				if( t.isIgnoreErrors() ){
+					// error++;
+				} else {
+					throw new StopAction( "Status: " + status );
 				}
 			}
-			break;
-		case "hosts":
-			cmd = new Hosts();
-			execution( t, cmd );
-			break;
-		case "include_vars":
-			include_vars( t );
-			break;
-		case "include":
-			include( t );
-			break;
-		case "user":
-			for( int i = 0; i < hosts.size(); i++ ){
-				SshServerManager ssh = getConnection( hosts, i );
-				hcmd = new User();
-				execution( t, hcmd, ssh );
-			}
-			break;
-		case "shell":
-			for( int i = 0; i < hosts.size(); i++ ){
-				SshServerManager ssh = getConnection( hosts, i );
-				Shell s = new Shell();
-				String command = getSingleLineCmd( t );
-				s.shell( command, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh, t.isSudo() );
-			}
-			break;
-		case "yum":
-			for( int i = 0; i < hosts.size(); i++ ){
-				SshServerManager ssh = getConnection( hosts, i );
-				Shell s = new Shell();
-				String command = getSingleLineCmd( t );
-				s.yum( command, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh );
-			}
-			break;
-		default:
-			throw new StopAction( "unknown CMD " + action );
 		}
 		return true;
 	}
@@ -275,8 +289,29 @@ public class Engine {
 		return cmd;
 	}
 
-	private SshServerManager getConnection( List<SshServerManager> hosts, int i ) throws InterruptedException, StopAction {
+	private SshServerManager getConnection( List<SshServerManager> hosts, int i, String remoteUser, String remotePwd ) throws InterruptedException, StopAction {
 		SshServerManager ssh = hosts.get( i );
+		if( remoteUser != null ){
+			if( remoteUser.compareTo( ssh.getUser() ) != 0 ){
+				if( ssh.isConnected() ){
+					ssh.close();
+				}
+				String ip = ssh.getHost();
+				System.out.println( "... switching user: new login to server nr  " + ( i + 1 ) + "/" + hosts.size() );
+				hosts.remove( i );
+				String privateKey = null;
+				File file = new File( prv, "users/key_" + remoteUser );
+				if( file.exists() )
+					privateKey = file.getAbsolutePath();
+				if( privateKey == null ){
+	        		ssh = new SshServerManager( remoteUser + "@" + ip, remotePwd );
+				} else {
+					String unlock = null;
+	        		ssh = new SshServerManager( remoteUser + "@" + ip, privateKey, unlock == null ? null : unlock.getBytes(), remotePwd );
+				}
+				hosts.add( i, ssh );
+			}
+		}
 		if( !ssh.isConnected() ){
 			int r = 0;
 			ExecutionStatus status = null;
@@ -284,8 +319,9 @@ public class Engine {
 				System.out.println( "... connecting to server nr  " + ( i + 1 ) + "/" + hosts.size()  ); // + hosts.get( i ) );
 				status = ssh.connect();
 				if( status != ExecutionStatus.Done ){
-					if( connectionRetry == r )
+					if( connectionRetry == r ){
 						break;
+					}
 					r++;
 					Thread.sleep( connectionRetryPause );
 					continue;
@@ -345,7 +381,7 @@ public class Engine {
 		}
 	}
 
-	private void execution( TaskAction t, ASelenevHostCmd executable, SshServerManager ssh ) throws Exception {
+	private ExecutionStatus execution( TaskAction t, ASelenevHostCmd executable, SshServerManager ssh ) throws Exception {
 		try {
 			Object map = t.getVars().get( "CMD" );
 			String[] args;
@@ -379,6 +415,7 @@ public class Engine {
 			args = evalVars( args );
 			Object o = executable.exec( args, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh );
 			vars.put( t.getAction(), o );
+			return o instanceof ExecutionStatus ? (ExecutionStatus)o : ExecutionStatus.Done;
 		} catch ( StopAction e ){
 			throw e;
 		} catch ( Exception e ){
@@ -399,6 +436,8 @@ public class Engine {
 	}
 
 	private String evalVars( String arg ) throws StopAction {
+		if( arg == null )
+			return null;
 		while( true ) {
 			int pos = arg.indexOf( "{{" );
 			if( pos != -1 ){

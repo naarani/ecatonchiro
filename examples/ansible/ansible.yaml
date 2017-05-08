@@ -1,0 +1,37 @@
+---
+
+- include: ../digitalocean/conditionalServerCreation.yaml
+  
+- include_vars: ansibleVar.yaml
+
+- name: epel
+  yum: install epel-release
+  sudo: yes
+
+- name: wget for pip
+  yum: install wget
+  sudo: yes
+
+- name: get pip
+  shell: wget https://bootstrap.pypa.io/get-pip.py
+  sudo: yes
+
+- name: install pip
+  shell: python get-pip.py
+  sudo: yes
+
+- name: install jinja2
+  shell: pip install '{{ verJINJA2 }}'
+  sudo: yes
+
+- name: install config requirements
+  yum: install python-devel libffi-devel openssl-devel gcc redhat-rpm-config
+  sudo: yes
+
+- name: install paramiko
+  shell: pip install paramiko 
+  sudo: yes
+
+- name: install ansible
+  shell: pip install ansible=="{{verANSIBLE}}"
+  sudo: yes

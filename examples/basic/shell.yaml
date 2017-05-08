@@ -3,6 +3,9 @@
 - include: ../digitalocean/conditionalServerCreation.yaml
 
 - name: ls ..
+  remote_user: workeruser
+  remote_password: "{{ workUserPwd }}"
+  ## switch from now the user for the next actions...
   shell: ls -l 
 
 - name: sudo ls..

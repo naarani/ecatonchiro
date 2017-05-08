@@ -114,7 +114,7 @@ public class IncludeVars {
 			}
 		} else {
 			String value = o.toString();
-			File file = new File( taskAction.getWorkdir(), value );
+			File file = new File( taskAction.getWorkdir(), "group_vars/" + value );
 			IncludeVars vars = new IncludeVars();
 			if( list.size() > 0 ) {
 				int aa = 0;

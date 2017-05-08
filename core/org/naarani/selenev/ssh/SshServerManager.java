@@ -158,7 +158,7 @@ public class SshServerManager {
 		try {
 			session.disconnect();
 	      	connected = true;
-	    } catch(Exception e){
+	    } catch( Exception e ){
 	    	System.out.println(e);
 	    }
 	}

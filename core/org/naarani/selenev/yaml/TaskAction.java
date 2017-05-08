@@ -19,6 +19,8 @@ public class TaskAction {
 	String include_vars;
 	IncludeVars vars;
 	
+	String remoteUser, remotePwd;
+	
 	boolean sudo;
 //	String environment;
 //	String register;
@@ -58,6 +60,22 @@ public class TaskAction {
 
 	public void setName(String name){
 		this.name = name;
+	}
+
+	public String getRemoteUser(){
+		return remoteUser;
+	}
+
+	public void setRemoteUser(String remoteUser){
+		this.remoteUser = remoteUser;
+	}
+
+	public String getRemotePwd(){
+		return remotePwd;
+	}
+
+	public void setRemotePwd(String remotePwd){
+		this.remotePwd = remotePwd;
 	}
 
 	public boolean isIgnoreErrors(){
@@ -114,6 +132,10 @@ public class TaskAction {
 			if( v.compareToIgnoreCase( "environment" ) == 0 )
 				continue;
 			if( v.compareToIgnoreCase( "notify" ) == 0 )
+				continue;
+			if( v.compareToIgnoreCase( "remote_password" ) == 0 )
+				continue;
+			if( v.compareToIgnoreCase( "remote_user" ) == 0 )
 				continue;
 //			if( v.compareToIgnoreCase( "include_vars" ) == 0 )
 //				continue;

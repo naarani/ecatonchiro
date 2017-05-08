@@ -10,6 +10,8 @@ public class Host {
 	
 	public String sshUser;
 
+	public String pwd;
+	
 	public String toString(){
 		return "\"" + name + "\" " + sshUser + "@" + ip + ":" + sshport;
 	}

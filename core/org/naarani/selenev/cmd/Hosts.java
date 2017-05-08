@@ -72,8 +72,8 @@ public class Hosts extends ASelenevCmd {
 	        			String hostname = (String)map.get( "hostname" );
 	        			AnsibleHost h3 = new AnsibleHost( hostname );
 	        			h3.addVariable( new AnsibleVariable( "ansible_host", (String)map.get( "ip.public" ) ) );
-	        			h3.addVariable( new AnsibleVariable( "ansible_port", "22" ) );
 	        			h3.addVariable( new AnsibleVariable( "ansible_user", "root" ) );
+	        			// h3.addVariable( new AnsibleVariable( "ansible_port", "22" ) );
 		        		inv.addHost( h3 );
 	        		}
 	        		saveHostsInventory( hosts, inv );
@@ -84,36 +84,12 @@ public class Hosts extends ASelenevCmd {
 		        //
 		        boolean list = options.has( "list" );
 		        if( list ){
-		        	System.out.println( "sigle hosts: " );
-			        for( Iterator<AnsibleHost>iterator = inv.getHosts().iterator(); iterator.hasNext(); ){
-			        	AnsibleHost singleHost = iterator.next();
-			        	if( singleHost.getName().compareTo( "---" ) == 0 )
-			        		break;
-			        	Host host = new Host();
-			        	host.name = singleHost.getName();
-			        	host.ip = (String)singleHost.getVariable( "ansible_host" ).getValue();
-			        	String ref = (String)singleHost.getVariable( "ansible_port" ).getValue();
-			        	if( ref != null )
-			        		host.sshport = Integer.parseInt( ref );
-			        	host.sshUser = (String)singleHost.getVariable( "ansible_user" ).getValue();
-			        	System.out.println( host );
-					}
-		        	System.out.println( "from groups: " );
-			        for( Iterator<AnsibleGroup>iterator = inv.getGroups().iterator(); iterator.hasNext(); ){
-			        	AnsibleGroup group = iterator.next();
-				        for( Iterator<AnsibleHost> it2 = group.getHosts().iterator(); it2.hasNext(); ){
-				        	AnsibleHost singleHost = it2.next();
-				        	if( singleHost.getName().compareTo( "---" ) == 0 )
-				        		break;
-				        	Host host = new Host();
-				        	host.name = singleHost.getName();
-				        	host.ip = (String)singleHost.getVariable( "ansible_host" ).getValue();
-				        	String ref = (String)singleHost.getVariable( "ansible_port" ).getValue();
-				        	if( ref != null )
-				        		host.sshport = Integer.parseInt( ref );
-				        	host.sshUser = (String)singleHost.getVariable( "ansible_user" ).getValue();
-				        	System.out.println( host );
-						}
+		        	System.out.println( "list all hosts: " );
+		        	Collection<AnsibleGroup> l1 = inv.getGroups();
+		        	Collection<AnsibleHost> l3 = inv.getHosts();
+			        List<Host> sum = hostList( l1, l3 );
+		        	for (int i = 0; i < sum.size(); i++) {
+		        		System.out.println( sum.get( i ) );
 					}
 		        } else {
 			        String filter = "";
@@ -231,10 +207,34 @@ public class Hosts extends ASelenevCmd {
 		Host host = new Host();
     	host.name = singleHost.getName();
     	host.ip = (String)singleHost.getVariable( "ansible_host" ).getValue();
-    	String ref = (String)singleHost.getVariable( "ansible_port" ).getValue();
-    	if( ref != null )
-    		host.sshport = Integer.parseInt( ref );
-    	host.sshUser = (String)singleHost.getVariable( "ansible_user" ).getValue();
+    	AnsibleVariable ref = singleHost.getVariable( "ansible_port" );
+    	if( ref != null ){
+        	if( ref.getValue() != null ){
+        		host.sshport = Integer.parseInt( (String)ref.getValue() );
+			}
+		}
+    	//
+    	ref = singleHost.getVariable( "ansible_user" );    	
+    	if( ref != null ){
+        	if( ref.getValue() != null ){
+            	host.sshUser = (String)ref.getValue();
+        	}
+    	}
+    	if( host.sshUser == null ){
+	    	ref = singleHost.getVariable( "ansible_ssh_user" );    	
+	    	if( ref != null ){
+	        	if( ref.getValue() != null ){
+	            	host.sshUser = (String)ref.getValue();
+	        	}
+	    	}
+    	}
+    	//
+    	ref = singleHost.getVariable( "ansible_ssh_pass" );    	
+    	if( ref != null ){
+        	if( ref.getValue() != null ){
+            	host.pwd = (String)ref.getValue();
+			}
+		}
 		return host;
 	}
 

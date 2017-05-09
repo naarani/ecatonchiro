@@ -1,19 +1,7 @@
 ---
 
-- include: ../digitalocean/conditionalServerCreation.yaml
-  
-- include_vars: ansibleVar.yaml
-
 - name: epel
-  yum:
-    name: epel-release
-    state: absent
-  sudo: yes
-
-- name: epel
-  yum: 
-    name: epel-release
-    state: present
+  yum: install epel-release
   sudo: yes
 
 - name: wget for pip

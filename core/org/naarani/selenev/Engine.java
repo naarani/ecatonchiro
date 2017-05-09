@@ -264,7 +264,11 @@ public class Engine {
 				case "yum":
 					Shell s2 = new Shell();
 					String c2 = getSingleLineCmd( t );
-					status = s2.yum( c2, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh );
+					if( c2.trim().length() == 0 ){
+						status = s2.yum( (HashMap)t.getVars().get( "CMD" ), prv.getAbsolutePath(), wk.getAbsolutePath(), ssh );
+					} else {
+						status = s2.yum( c2, prv.getAbsolutePath(), wk.getAbsolutePath(), ssh );
+					}
 					break;
 				default:
 					throw new StopAction( "unknown CMD " + action );
@@ -281,6 +285,9 @@ public class Engine {
 	}
 
 	private String getSingleLineCmd( TaskAction t ) throws IOException, StopAction {
+		Object o = t.getVars().get( "CMD" );
+		if( ! ( o instanceof String ) )
+			return "";
 		String cmd = (String) t.getVars().get( "CMD" );
 		if( cmd == null ) {
 			cmd = "";

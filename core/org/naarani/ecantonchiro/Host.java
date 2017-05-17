@@ -1,0 +1,19 @@
+package org.naarani.ecantonchiro;
+
+public class Host {
+
+	public String name;
+	
+	public String ip;
+	
+	public int sshport = 22;
+	
+	public String sshUser;
+
+	public String pwd;
+	
+	public String toString(){
+		return "\"" + name + "\" " + sshUser + "@" + ip + ":" + sshport;
+	}
+	
+}

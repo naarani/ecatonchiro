@@ -2,9 +2,9 @@ package jtest.myserver.centos;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
-import org.naarani.selenev.ssh.SshServerManager;
-import org.naarani.selenev.ssh.centos.UserLibCentos;
-import org.naarani.selenev.ssh.ExecutionStatus;
+import org.naarani.ecantonchiro.ssh.ExecutionStatus;
+import org.naarani.ecantonchiro.ssh.SshServerManager;
+import org.naarani.ecantonchiro.ssh.centos.UserLibCentos;
 
 public class CentosTest {
 

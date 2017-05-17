@@ -3,7 +3,7 @@ package jtest.yaml.task.format;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.naarani.selenev.yaml.YamlTaskLib;
+import org.naarani.ecantonchiro.yaml.YamlTaskLib;
 
 public class ValidateTaskWithVars {
 

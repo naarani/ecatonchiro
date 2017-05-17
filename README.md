@@ -1,4 +1,5 @@
-# SELENE V
+# Ecantonchiro - "Hundred-Handed Ones"
+
 (agentless) automation engine
 
 This is actually in alpha stage, if you're not a developer it's not still ready for you.
@@ -21,7 +22,7 @@ I need 'em to test kargo and kubeadm releases, before evaluate to use 'em in pro
 The requirements of kargo are some pre-flight activities and ansible with specific version, while kubeadm needs only some preflight checks.
 
 I've decided to put all in a new application where the install start with yaml configuration file like ansible:
-this is Selene V.
+this is Ecantonchiro.
 
 
 
@@ -31,7 +32,7 @@ The application is in pre alpha stage:
 (2017/05/05) actually only provisiong server from DigitalOcean is working with yaml configurations files, as described in the wiki 
 
 
-[Roadmap](https://github.com/naarani/selenev/wiki/roadmap)
+[Roadmap](https://github.com/naarani/ecantonchiro/wiki/roadmap)
 
 
 
@@ -39,8 +40,8 @@ The application is in pre alpha stage:
 
 to build the project run:
 
-    $ git clone https://github.com/naarani/selenev.git
-    $ cd selenev
+    $ git clone https://github.com/naarani/ecantonchiro.git
+    $ cd ecantonchiro
     $ gradle --task jarWithLib
 
 it will create in the _build/libs/_ directory the main jar runnable with all the needed jars in the directory _lib_ 

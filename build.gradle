@@ -9,7 +9,7 @@ apply plugin: 'eclipse'
 
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-mainClassName="org.naarani.selenev.Run"
+mainClassName="org.naarani.ecantonchiro.Run"
 
 task wrapper(type: Wrapper) {
     gradleVersion = '3.4.1'
@@ -56,9 +56,12 @@ dependencies {
 }
 
 sourceSets {
+    test {
+	    java.srcDirs = ['test']
+    }
     main {
         java {
-            srcDirs = ['core', 'test', 'jclouds', 'migrationInProgress']
+            srcDirs = ['core', 'jclouds', 'migrationInProgress']
         }
     }
 }
@@ -70,7 +73,7 @@ jar.doFirst {
 		    'Specification-Version': version.replace('-SNAPSHOT', '')
 		    , 'Implementation-Version': version
 	        , 'Class-Path': configurations.compile.collect { 'lib/' + it.getName() }.join(' ')
-		    , 'Main-Class': 'org.naarani.selenev.Run'
+		    , 'Main-Class': 'org.naarani.ecantonchiro.Run'
         )
     } 
 }

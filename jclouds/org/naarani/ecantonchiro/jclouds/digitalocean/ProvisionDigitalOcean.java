@@ -35,7 +35,7 @@ import org.jclouds.compute.RunNodesException;
 import org.jclouds.sshj.config.SshjSshClientModule;
 import org.naarani.core.exceptions.StopAction;
 import org.naarani.ecantonchiro.Engine;
-import org.naarani.ecantonchiro.cmd.ASelenevCmd;
+import org.naarani.ecantonchiro.cmd.AEcatonchiroCmd;
 import org.naarani.ecantonchiro.ssh.ExecutionStatus;
 import org.naarani.ecantonchiro.ssh.SshServerManager;
 import org.naarani.ecantonchiro.ssh.centos.UserLibCentos;
@@ -45,7 +45,7 @@ import com.google.inject.Module;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-public class ProvisionDigitalOcean extends ASelenevCmd {
+public class ProvisionDigitalOcean extends AEcatonchiroCmd {
 	
 	static private Logger logger = Logger.getLogger( ProvisionDigitalOcean.class );
 

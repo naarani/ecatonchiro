@@ -14,7 +14,7 @@ public class Run {
         parser.acceptsAll( java.util.Arrays.asList( "h", "?", "help" ), "show help" ).forHelp();
 		if( args.length == 0 ) {
 			System.out.println( "" );
-			System.out.println( "Selene V - automation engine (C) 2017 Diego Zanga" );
+			System.out.println( "Ecatonchiro - automation engine (C) 2017 Diego Zanga" );
 			System.out.println( "Version " + Version.VER );
 			System.out.println( "" );
 			System.out.println( "" );

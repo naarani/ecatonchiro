@@ -13,8 +13,8 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import org.apache.log4j.Logger;
 import org.naarani.core.exceptions.StopAction;
-import org.naarani.ecantonchiro.cmd.ASelenevCmd;
-import org.naarani.ecantonchiro.cmd.ASelenevHostCmd;
+import org.naarani.ecantonchiro.cmd.AEcatonchiroCmd;
+import org.naarani.ecantonchiro.cmd.AEcatonchiroHostCmd;
 import org.naarani.ecantonchiro.cmd.Hosts;
 import org.naarani.ecantonchiro.cmd.Shell;
 import org.naarani.ecantonchiro.cmd.User;
@@ -197,8 +197,8 @@ public class Engine {
 	protected HashMap vars = new HashMap();
 	
 	protected boolean execute( TaskAction t ) throws Exception {
-		ASelenevCmd cmd;
-		ASelenevHostCmd hcmd;
+		AEcatonchiroCmd cmd;
+		AEcatonchiroHostCmd hcmd;
 		@SuppressWarnings("unchecked")
 		List<SshServerManager> hosts = (List<SshServerManager>) vars.get( "hosts" );
 		String action = t.getAction();
@@ -347,7 +347,7 @@ public class Engine {
 		vars.putAll( l );
 	}
 
-	private void execution( TaskAction t, ASelenevCmd executable ) throws Exception {
+	private void execution( TaskAction t, AEcatonchiroCmd executable ) throws Exception {
 		try {
 			Object map = t.getVars().get( "CMD" );
 			String[] args;
@@ -388,7 +388,7 @@ public class Engine {
 		}
 	}
 
-	private ExecutionStatus execution( TaskAction t, ASelenevHostCmd executable, SshServerManager ssh ) throws Exception {
+	private ExecutionStatus execution( TaskAction t, AEcatonchiroHostCmd executable, SshServerManager ssh ) throws Exception {
 		try {
 			Object map = t.getVars().get( "CMD" );
 			String[] args;

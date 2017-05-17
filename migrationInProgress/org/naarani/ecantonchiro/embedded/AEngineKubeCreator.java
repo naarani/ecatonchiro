@@ -27,7 +27,7 @@ public class AEngineKubeCreator {
 	
 	protected String mainServer;
 
-	protected String userName = "selenev";
+	protected String userName = "ecatonchiro";
 	protected String userPwd = "a_a223Fsad3__";
 	protected String sshKeyUser;
 

@@ -10,7 +10,7 @@ import org.naarani.ecantonchiro.ssh.centos.UserLibCentos;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-public class User extends ASelenevHostCmd {
+public class User extends AEcatonchiroHostCmd {
 
 	static private Logger logger = Logger.getLogger( User.class );
 

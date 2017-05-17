@@ -25,7 +25,7 @@ import it.andreascarpino.ansible.inventory.util.AnsibleInventoryWriter;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
-public class Hosts extends ASelenevCmd {
+public class Hosts extends AEcatonchiroCmd {
 	
 	static private Logger logger = Logger.getLogger( Hosts.class );
 
@@ -142,14 +142,14 @@ public class Hosts extends ASelenevCmd {
         	body += new String( buffer, 0, size );
         }
         in.close();
-        body = body.replace( "selenev", "ansible" );
+        body = body.replace( "ecatonchiro", "ansible" );
         AnsibleInventory inv = AnsibleInventoryReader.read( body );
         return inv;
 	}
 
 	private void saveHostsInventory( File hosts, AnsibleInventory inv ) throws IOException {
         String body = AnsibleInventoryWriter.write( inv );
-    	body = body.replace( "ansible", "selenev" );
+    	body = body.replace( "ansible", "ecatonchiro" );
         //
     	FileOutputStream ou = new FileOutputStream( hosts );
     	ou.write( body.getBytes() );

@@ -1,15 +1,17 @@
 package org.naarani.ecantonchiro.cmd;
 
+import org.naarani.ecantonchiro.ssh.SshServerManager;
+
 import joptsimple.OptionParser;
 
-public class ASelenevCmd {
+public class AEcatonchiroHostCmd {
 
 	public static void main( String[] args ) throws Exception {
 		org.apache.log4j.BasicConfigurator.configure();
-		new ASelenevCmd().exec( args, null, null );
+		new AEcatonchiroHostCmd().exec( args, null, null, null );
 	}
 
-	public Object exec( String[] args, String prv, String wk ) throws Exception {
+	public Object exec( String[] args, String prv, String wk, SshServerManager ssh ) throws Exception {
         return null;
 	}
 

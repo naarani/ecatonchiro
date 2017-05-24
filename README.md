@@ -1,4 +1,4 @@
-# Ecantonchiro - "Hundred-Handed Ones"
+# Ecantonchiro - "Hundred-Handed Ones" - designed for the developers
 
 (agentless) automation engine
 

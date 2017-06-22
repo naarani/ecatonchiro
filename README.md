@@ -45,6 +45,9 @@ the actual features are to run remote scripted commands from ssh like:
 
 ... now working on templates reusing jinja2 templates on java with jinjava
 
+P.S. 
+We are already working on web GUI, but all will still work with a simple CLI
+
 
 
 ## Build jar

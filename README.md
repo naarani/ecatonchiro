@@ -33,7 +33,7 @@ The application is in pre alpha stage:
 
 (2017/05/05) actually only provisiong server from DigitalOcean is working with yaml configurations files, as described in the wiki 
 
-[Roadmap](https://github.com/naarani/ecantonchiro/wiki/roadmap)
+[Roadmap](https://github.com/naarani/ecatonchiro/wiki/Roadmap)
 
 the actual features are to run remote scripted commands from ssh like:
 
